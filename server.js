@@ -35,32 +35,7 @@ app.get('/weather', (req, res) => {
   } else {
     res.send('please enter the lon and lat')
   }
-  app.get('/movies', getMoviesHandler)
-  function  getMoviesHandler(req, res) {
-    let userInput = req.query.query;
-    let moviekey = process.env.MOVIE_API_KEY;
-    let url = `https://api.themoviedb.org/3/search/movie?api_key=${moviekey}&query=${userInput}`;
-    axios.get(url).then(result =>{
-        const movieArray = result.data.results.map(item=>{
-        return new Movie (item);
-        })
-    res.send(movieArray);
-    })
-    .catch(error =>{
-      res.send(`there is an error in getting the data => ${error}`);
-    })
-  }
-class Movie {
-    constructor(item) {
-        this.title=item.title;
-        this.overview=item.overview;
-        this.averageVotes=item.vote_average;
-        this.totalVotes=item.total_votes;
-        this.imagel=`https://image.tmdb.org/t/p/original${item.poster_path}`;
-        this.popularity=item.popularity;
-        this.releasedOn=item.release_date;
-    }
-    }
+
 
 })
 class Weather {
@@ -70,5 +45,31 @@ class Weather {
   }
 
 }
+app.get('/movies', (req, res) => {
 
+  const moviesName = req.query.query;
+  const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
+  const moviesUrl = `https://api.themoviedb.org/3/search/movie?api_key=${MOVIE_API_KEY}&query=${moviesName}`;
+  axios.get(moviesUrl).then(mov => {
+    const movieArray = mov.data.results.map(item => {
+      return new Movie(item);
+    })
+    res.send(movieArray);
+  })
+    .catch(error => {
+      res.send(`there is an error in getting the data => ${error}`);
+    })
+}
+)
+
+class Movie {
+  constructor(elements) {
+    this.title = elements.title;
+    this.overview = elements.overview;
+    this.averageVotes = elements.vote_average;
+    this.totalVotes = elements.total_votes;
+    this.popularity = elements.popularity;
+    this.releasedOn = elements.release_date;
+  }
+}
 app.listen(PORT) // kick start the express server to work
